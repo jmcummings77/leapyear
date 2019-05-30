@@ -17,15 +17,39 @@ Broadly those optimizations are:
 Example results format:
 
 ```json
+[{    
+    "NoPrintReducedModulos": 115.77,
+    "NoPrintCounter": 239.98,
+    "NoPrintCountByFour": 54.16,
+    "LeapYearModulos": 74.86,
+    "LeapYearCounter": 58.32,
+    "LeapYearLinq": 258.19
+},
 {
-    "no_print_reduced_modulos": 22.656354904174805,
-    "no_print_counter": 34.19808387756348,
-    "no_print_count_by_four": 11.428391933441162,
-    "leap_year_modulos": 8.139839172363281,
-    "leap_year_counter": 8.39179277420044,
-    "leap_year_no_loops": 9.034435749053955,
-    "leap_year_sets": 4.163060188293457
-}
+    "leapYear": 45.34,
+    "leapYearCounter": 39,
+    "leapYearModulos": 40.84,
+    "noPrintCountByFour": 38.4,
+    "noPrintCounter": 148.06,
+    "noPrintReducedModulos": 67.24
+},
+{
+    "leapYearModulos": 110.26716390000657,
+    "leapYearCounter": 111.66275182003156,
+    "leapYearNoLoops": 1091.6129790399968,
+    "noPrintReducedModulos": 156.53878397995607,
+    "noPrintCounter": 607.1191596999764,
+    "noPrintCountByFour": 124.87465265996754
+},
+{
+    "no_print_reduced_modulos": 2095.338363647461,
+    "no_print_counter": 3259.244499206543,
+    "no_print_count_by_four": 1122.3544692993164,
+    "leap_year_modulos": 804.6444940567017,
+    "leap_year_counter": 811.4770174026489,
+    "leap_year_no_loops": 941.9522285461426,
+    "leap_year_sets": 1080.1961708068848
+}]
 ```
 
 Thus far, Go wins out as the best overall performance. The worst Go implementation is better than the best C# implementation. In turn the worst C# implementation is better than the best JavaScript implementation and so on until Python shows up several minutes later wondering where everyone went.

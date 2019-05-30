@@ -5,3 +5,4 @@ node_modules
 /obj/
 /results/
 /bin/
+.DS_Store

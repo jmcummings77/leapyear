@@ -1,8 +1,8 @@
-/venv/
+/Python/venv/
 .idea
 .vscode
-node_modules
-/obj/
+/JavaScript/node_modules
+/C_Sharp/obj/
 /results/
-/bin/
+/C_Sharp/bin/
 .DS_Store

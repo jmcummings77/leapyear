@@ -1,0 +1,1 @@
+{"no_print_reduced_modulos": 22.656354904174805, "no_print_counter": 34.19808387756348, "no_print_count_by_four": 11.428391933441162, "leap_year_modulos": 8.139839172363281, "leap_year_counter": 8.39179277420044, "leap_year_no_loops": 9.034435749053955, "leap_year_sets": 4.163060188293457}

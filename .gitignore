@@ -1,0 +1,7 @@
+/venv/
+.idea
+.vscode
+node_modules
+/obj/
+/results/
+/bin/

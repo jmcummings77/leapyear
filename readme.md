@@ -17,7 +17,8 @@ Broadly those optimizations are:
 Example results format:
 
 ```json
-[{    
+[
+"C#":{    
     "NoPrintReducedModulos": 115.77,
     "NoPrintCounter": 239.98,
     "NoPrintCountByFour": 54.16,
@@ -25,7 +26,7 @@ Example results format:
     "LeapYearCounter": 58.32,
     "LeapYearLinq": 258.19
 },
-{
+"Go":{
     "leapYear": 45.34,
     "leapYearCounter": 39,
     "leapYearModulos": 40.84,
@@ -33,7 +34,7 @@ Example results format:
     "noPrintCounter": 148.06,
     "noPrintReducedModulos": 67.24
 },
-{
+"JavaScript":{
     "leapYearModulos": 110.26716390000657,
     "leapYearCounter": 111.66275182003156,
     "leapYearNoLoops": 1091.6129790399968,
@@ -41,7 +42,7 @@ Example results format:
     "noPrintCounter": 607.1191596999764,
     "noPrintCountByFour": 124.87465265996754
 },
-{
+"Python":{
     "no_print_reduced_modulos": 2095.338363647461,
     "no_print_counter": 3259.244499206543,
     "no_print_count_by_four": 1122.3544692993164,

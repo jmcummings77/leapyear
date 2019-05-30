@@ -1,7 +1,7 @@
 #!/bin/bash
 
 start=1582
-finish=2400000
+finish=24000000
 iterations=50
 py_file="../results/py_results.json"
 go_file="../results/go_results.json"

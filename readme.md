@@ -1,5 +1,7 @@
 # Leap Year William
 
+![leapyyearwilliam](https://pixel.nymag.com/imgs/daily/vulture/2016/02/29/29-leap-day-30-rock-1.w710.h473.2x.jpg)
+
 This repository consists of alternative implementations of an algorithm to produce a list of leap years given a start and end year. The code is bad and I *do* feel bad. This is the only documentation you will get because I am a busy, busy man (read: lazy).
 
 Each language file (leap_year.py, LeapYear.cs, leapYear.go, leapYear.js) contains a core set of functions which represent some of the most common implementations and optimizations people suggest. I tried to implement each optimization category (1) on its own, then (2) paired with each of the other optimizations one at a time, then (3) all combined together to the greatest extent possible. That meant including unnecessary modulos in certain locations for consistency.

@@ -241,8 +241,8 @@ def evaluate_performance(start, finish, filename, iterations, run_print):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--start', type=int, nargs='?', default=1582, help='Start year.')
-    parser.add_argument('-f', '--finish', type=int, nargs='?', default=24000, help='Final year.')
-    parser.add_argument('-i', '--iterations', type=int, nargs='?', default=100, help='Number of iterations to run each function for profiling.')
+    parser.add_argument('-f', '--finish', type=int, nargs='?', default=2020, help='Final year.')
+    parser.add_argument('-i', '--iterations', type=int, nargs='?', default=1, help='Number of iterations to run each function for profiling.')
     parser.add_argument('-o', '--output', type=str, nargs='?', default="../results/python_results.json", help='File path for output.')
     parser.add_argument('-r', action='store_true', help='Flag indicating whether to run tests for methods that print to the terminal.')
     args = parser.parse_args()

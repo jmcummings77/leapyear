@@ -20,6 +20,14 @@ def timing(f):
 
 
 @timing
+def code_golf(start, finish):
+    [print(y)for y in range(start,finish,4)if(4>y&15)|y%25]
+
+@timing
+def leap_bit(start, finish):
+    [print(y) for y in range(start, finish + 1) if (not (y & 3)) and (y % 25 or (4 > y & 15))]
+
+@timing
 def no_optimizations(start, finish):
     for year in range(start, finish):
         is_divisible_by_4 = year % 4 == 0
@@ -122,6 +130,21 @@ def no_print_count_by_four(start, finish):
 
 # fully optimized
 @timing
+def leap_bit_no_print(start, finish):
+    result = []
+    finish += 4
+    mod = start % 4
+    if mod != 0:
+        start += 4 - mod
+    for year in range(start, finish + 4, 4):
+        if year & 15 < 1:
+            if year % 25:
+                result.append(year)
+        else:
+            result.append(year)
+    return result
+
+@timing
 def leap_year_modulos(start, finish):
     finish += 4
     mod = start % 4
@@ -199,6 +222,8 @@ def evaluate_performance(start, finish, filename, iterations, run_print):
             reduced_modulos(start, finish)
             counter(start, finish)
             count_by_four(start, finish)
+            leap_bit(start, finish)
+        leap_bit_no_print(start, finish)
         no_print_reduced_modulos(start, finish)
         no_print_counter(start, finish)
         no_print_count_by_four(start, finish)

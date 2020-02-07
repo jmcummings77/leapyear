@@ -14,7 +14,7 @@ Broadly those optimizations are:
 4. Eliminating modulos altogether from the for loops in favor of a counter and if statements (mods still required at the beginning to determine where the start year is in relation to the full 400 year cycle)
 5. Language specific "optimizations" which were of course not possible to reproduce and compare across languages, and most of which were either substantially slower (e.g. LINQ in C#) or only marginally competitive (range/filter in Python)
 
-Example results format:
+Example results format (all times in ms averaged from 100 iterations of a 24m year run):
 
 ```json
 [{

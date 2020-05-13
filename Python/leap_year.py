@@ -21,7 +21,8 @@ def timing(f):
 
 @timing
 def code_golf(start, finish):
-    [print(y)for y in range(start,finish,4)if(4>y&15)|y%25]
+    y=450
+    while y<600:y+=1;1>y%25<y%4or print(y*4)
 
 @timing
 def leap_bit(start, finish):

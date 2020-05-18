@@ -12,17 +12,18 @@ namespace C_Sharp
         public static void Run(string[] args)
         {
             int start = 1582;
-            int finish = 24000;
+            int finish = 2400000;
             int iterations = 100;
+            var print = false;
             var success = int.TryParse(args[0], out start);
             success = success && int.TryParse(args[1], out finish);
+            var parse = bool.TryParse(args[4], out print);
             var hasIterations = success && int.TryParse(args[2], out iterations);
             if(!success)
             {
                 Console.WriteLine("Bad inputs: must be three integers and a file name separated by spaces. => start finish iterations outfilename");
             }
-            bool print = false;
-            var parse = bool.TryParse(args[4], out print);
+            
             var results = new List<object>();
             if (print)
             {
@@ -32,13 +33,15 @@ namespace C_Sharp
                 results.Add(MeasureSlow(start, finish, Counter, "Counter", iterations));
                 results.Add(MeasureSlow(start, finish, CountByFour, "CountByFour", iterations));
             }
-            
+
+            results.Add(Measure(start, finish, LeapYearBitShifts, "LeapYearBitShifts", iterations));
             results.Add(Measure(start, finish, NoPrintReducedModulos, "NoPrintReducedModulos", iterations));
             results.Add(Measure(start, finish, NoPrintCounter, "NoPrintCounter", iterations));
             results.Add(Measure(start, finish, NoPrintCountByFour, "NoPrintCountByFour", iterations));
             results.Add(Measure(start, finish, LeapYearModulos, "LeapYearModulos", iterations));
             results.Add(Measure(start, finish, LeapYearCounter, "LeapYearCounter", iterations));
             results.Add(Measure(start, finish, LeapYearLinq, "LeapYearLinq", iterations));
+            results.Add(Measure(start, finish, LeapYearLinqBitShift, "LeapYearLinqBitShift", iterations));
             File.WriteAllText(args[3], JsonConvert.SerializeObject(results));
         }
 
@@ -117,16 +120,15 @@ namespace C_Sharp
             while(start % 4 != 0) {
                 start++;
             }
-            var hundredCounter = Math.Floor((start % 100.0) / 4.0);;
-            var fourHundredCounter = Math.Floor((start % 400.0) / 100.0);
+            var hundredCounter = (int)Math.Floor((start % 100.0) / 4.0);;
+            var fourHundredCounter = (int)Math.Floor((start % 400.0) / 100.0);
             for (var year = start; year < finish; year++) {
                 if (hundredCounter == 100) {
                     fourHundredCounter++;
                     hundredCounter = 1;
-                    if (fourHundredCounter == 4) {
-                        Console.WriteLine(year);
-                        fourHundredCounter = 0;
-                    }
+                    if (fourHundredCounter != 4) continue;
+                    Console.WriteLine(year);
+                    fourHundredCounter = 0;
                 } else {
                     hundredCounter++;
                     Console.WriteLine(year);
@@ -186,16 +188,15 @@ namespace C_Sharp
             while(start % 4 != 0) {
                 start++;
             }
-            var hundredCounter = Math.Floor((start % 100.0) / 4.0);;
-            var fourHundredCounter = Math.Floor((start % 400.0) / 100.0);
+            var hundredCounter = (int)Math.Floor((start % 100.0) / 4.0);;
+            var fourHundredCounter = (int)Math.Floor((start % 400.0) / 100.0);
             for (var year = start; year < finish; year++) {
                 if (hundredCounter == 100) {
                     fourHundredCounter++;
                     hundredCounter = 1;
-                    if (fourHundredCounter == 4) {
-                        results.Add(year);
-                        fourHundredCounter = 0;
-                    }
+                    if (fourHundredCounter != 4) continue;
+                    results.Add(year);
+                    fourHundredCounter = 0;
                 } else {
                     hundredCounter++;
                     results.Add(year);
@@ -208,20 +209,21 @@ namespace C_Sharp
         // fully optimized
         private static int[] LeapYearModulos(int start, int finish) 
         {
-            while (start % 4 != 0) {
+            while (start % 4 != 0) 
+            {
                 start++;
             }
+            
             finish += 4;
             var results = new List<int>();
-            for (var year = start; year < finish; year+=4) {
-                if(year % 100 == 0) {
-                    if (year % 400 == 0) {
-                        results.Add(year);
-                    }
-                } else {
+            for (var year = start; year < finish; year+=4) 
+            {
+                if (year % 100 != 0 || year % 400 == 0)
+                {
                     results.Add(year);
                 }
             }
+            
             return results.ToArray();
         }
 
@@ -232,19 +234,17 @@ namespace C_Sharp
             if (mod != 0) {
                 start += 4 - mod;
             }
-            var hundredCounter = Math.Floor((start % 100.0) / 4.0);;
-            var fourHundredCounter = Math.Floor((start % 400.0) / 100.0);
+            var hundredCounter = (int)Math.Floor((start % 100.0) / 4.0);;
+            var fourHundredCounter = (int)Math.Floor((start % 400.0) / 100.0);
             for (var year = start; year < finish; year+=4) 
             {
                 if (hundredCounter == 25) 
                 {
                     fourHundredCounter++;
                     hundredCounter = 1;
-                    if (fourHundredCounter == 4) 
-                    {
-                        results.Add(year);
-                        fourHundredCounter = 0;
-                    }
+                    if (fourHundredCounter != 4) continue;
+                    results.Add(year);
+                    fourHundredCounter = 0;
                 } 
                 else 
                 {
@@ -254,11 +254,36 @@ namespace C_Sharp
             }
             return results.ToArray();
         }
+        
+        private static int[] LeapYearBitShifts(int start, int finish) 
+        {
+            while ((start & 3) != 0) 
+            {
+                start++;
+            }
+            finish += 4;
+            var results = new List<int>();
+            for (var year = start; year < finish; year+=4) 
+            {
+                if (year % 25 != 0 || (year & 15) == 0)
+                {
+                    results.Add(year);
+                } 
+            }
+
+            return results.ToArray();
+        }
 
         private static int[] LeapYearLinq(int start, int finish)
         {
             return Enumerable.Range(start, finish - start + 1).Where(x => x % 4 == 0)
                 .Where(y => y % 100 != 0 || y % 400 == 0).ToArray();
+        }
+        
+        private static int[] LeapYearLinqBitShift(int start, int finish)
+        {
+            return Enumerable.Range(start, finish - start + 1).Where(x => (x & 3) == 0)
+                .Where(year => year % 25 != 0 || (year & 15) == 0).ToArray();
         }
     }
 }

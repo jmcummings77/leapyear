@@ -2,8 +2,9 @@ import time
 import math
 import statistics
 import argparse
-import os
 import json
+
+import numpy as np
 
 times = {}
 
@@ -214,6 +215,95 @@ def leap_year_sets(start, finish):
             set(range(start, finish, 100)).difference(set(range(start, finish, 400))))))
     return result
 
+@timing
+def leap_year_additive(start, finish):
+    finish += 4
+    result = []
+    base = [i for i in range(0, 401, 4) if i != 100 and i != 200 and i != 300]
+    mod = start % 4
+    if mod != 0:
+        start += 4 - mod
+    hundred_counter = math.floor(((start % 100) / 4))
+    four_hundred_counter = math.floor(((start % 400) / 100))
+    for year in range(start, finish, 4):
+        if hundred_counter == 25:
+            four_hundred_counter += 1
+            hundred_counter = 1
+            if four_hundred_counter == 4:
+                start = year
+                break
+        else:
+            hundred_counter += 1
+            result.append(year)
+    total = finish - start
+    leftover = total % 400
+    total -= leftover
+    while start < finish - leftover:
+        result.extend([i + start for i in base])
+        start += 400
+    if leftover:
+        result.extend([i for i in range(finish - leftover, finish, 4) if i % 100 != 0])
+    return result
+
+@timing
+def leap_year_additive2(start, finish):
+    finish += 4
+    result = []
+    mod = start % 4
+    if mod != 0:
+        start += 4 - mod
+    hundred_counter = math.floor(((start % 100) / 4))
+    four_hundred_counter = math.floor(((start % 400) / 100))
+    for year in range(start, finish, 4):
+        if hundred_counter == 25:
+            four_hundred_counter += 1
+            hundred_counter = 1
+            if four_hundred_counter == 4:
+                start = year
+                break
+        else:
+            hundred_counter += 1
+            result.append(year)
+    total = finish - start
+    leftover = total % 400
+    total -= leftover
+    result.extend([i + j + start for i in range(0, 401, 4) if i != 100 and i != 200 and i != 300 for j in range(0, total, 400)])
+    if leftover:
+        result.extend([i for i in range(finish - leftover, finish, 4) if i % 100 != 0])
+    return result
+
+@timing
+def leap_year_numpy(start, finish):
+    finish += 4
+    result = []
+    base = np.array([i for i in range(0, 400, 4) if i != 100 and i != 200 and i != 300])
+    mod = start % 4
+    if mod != 0:
+        start += 4 - mod
+    hundred_counter = math.floor(((start % 100) / 4))
+    four_hundred_counter = math.floor(((start % 400) / 100))
+    for year in range(start, finish, 4):
+        if hundred_counter == 25:
+            four_hundred_counter += 1
+            hundred_counter = 1
+            if four_hundred_counter == 4:
+                start = year
+                break
+        else:
+            hundred_counter += 1
+            result.append(year)
+    total = finish - start
+    leftover = total % 400
+    total -= leftover
+    temp = np.hstack((np.array(result), base + start))
+    upperbound = finish - 400 - leftover
+    while start < upperbound:
+        start += 400
+        temp = np.hstack((temp, base + start))
+    if leftover:
+        temp = np.hstack((temp, np.array([i for i in range(finish - leftover, finish, 4) if i % 100 != 0 or i % 400 == 0])))
+    return temp
+
 
 def evaluate_performance(start, finish, filename, iterations, run_print):
     for _ in range(iterations):
@@ -232,6 +322,10 @@ def evaluate_performance(start, finish, filename, iterations, run_print):
         leap_year_counter(start, finish)
         leap_year_no_loops(start, finish)
         leap_year_sets(start, finish)
+        # warning very slow
+        # leap_year_numpy(start, finish)
+        leap_year_additive(start, finish)
+        leap_year_additive2(start, finish)
     results = {}
     for key, value in times.items():
         results[key] = statistics.mean(times[key])

@@ -1,0 +1,79 @@
+{
+  "started_at_utc": "2026-10-04T02:16:47.080850+00:00",
+  "finished_at_utc": "2026-10-04T02:16:52.497017+00:00",
+  "environment": {
+    "os": "macOS-26.5.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "cpu": "Apple M1",
+    "python": "3.9.6",
+    "go": "go version go1.24.1 darwin/arm64",
+    "node": "v25.9.0",
+    "dotnet_sdk": "8.0.201",
+    "dotnet_runtimes": [
+      "Microsoft.AspNetCore.App 5.0.9",
+      "Microsoft.AspNetCore.App 6.0.13",
+      "Microsoft.AspNetCore.App 7.0.1",
+      "Microsoft.AspNetCore.App 8.0.2",
+      "Microsoft.NETCore.App 5.0.9",
+      "Microsoft.NETCore.App 6.0.13",
+      "Microsoft.NETCore.App 7.0.1",
+      "Microsoft.NETCore.App 8.0.2"
+    ]
+  },
+  "settings": {
+    "start_inclusive": 1582,
+    "finish_exclusive": 1000000,
+    "measured_iterations_per_method": 10,
+    "warmup_iterations_per_method": 3,
+    "printing": false,
+    "statistic": "arithmetic mean",
+    "unit": "milliseconds",
+    "expected_leap_year_count": 242116,
+    "execution": "sequential language processes; warmups in each process; build and process startup excluded",
+    "csharp_configuration": "Release"
+  },
+  "source_sha256": {
+    "Python/leap_year.py": "fc80199bf48dc2194d67a3e61c349572eb2d04baf170e7b879edb98bcf177cb6",
+    "Go/leapYear.go": "08235170d9299fb195458a428934530de0d165fe19da32a48c4c17690960b181",
+    "JavaScript/leapYear.js": "d91fa65c71c4f5b2ab61cd4c148307c717c7685f067a5e7f943f020c8a068835",
+    "C_Sharp/LeapYear.cs": "d4a82992b4883108d02d1e37b153c33394a79096da4dd0c3bbcd30028f610097",
+    "C_Sharp/C_Sharp.csproj": "d6ff39f331ce529a2f8b30e35ca128c5e4e6c0022eb8807df227535c44b5514e",
+    "scripts/benchmark.py": "02244a640783d52db5e0586a71f8d8ff895d4dc9a6768f51b79e8832c692cba7"
+  },
+  "mean_ms": {
+    "Python": {
+      "leap_bit_no_print": 16.232262399999975,
+      "no_print_reduced_modulos": 60.85687480000006,
+      "no_print_counter": 125.12662939999997,
+      "no_print_count_by_four": 21.215695800000113,
+      "leap_year_modulos": 37.65331689999998,
+      "leap_year_counter": 24.707158299999985,
+      "leap_year_no_loops": 17.67766679999998,
+      "leap_year_sets": 23.89642929999991
+    },
+    "Go": {
+      "leapYear": 3.049525,
+      "leapYearCounter": 2.1932917,
+      "leapYearModulos": 2.0694624999999998,
+      "noPrintCountByFour": 2.9087042,
+      "noPrintCounter": 3.0820916,
+      "noPrintReducedModulos": 3.2528501
+    },
+    "JavaScript": {
+      "leapYearModulos": 2.109158299999999,
+      "leapYearCounter": 1.6084834000000008,
+      "leapYearNoLoops": 14.11122070000001,
+      "noPrintReducedModulos": 2.125237500000014,
+      "noPrintCounter": 4.066958500000004,
+      "noPrintCountByFour": 2.0906458999999984
+    },
+    "C#": {
+      "NoPrintReducedModulos": 1.5507499999999999,
+      "NoPrintCounter": 1.9047100000000001,
+      "NoPrintCountByFour": 1.53213,
+      "LeapYearModulos": 1.2186299999999999,
+      "LeapYearCounter": 0.8626999999999999,
+      "LeapYearLinq": 7.85415
+    }
+  }
+}

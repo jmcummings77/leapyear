@@ -1,0 +1,11 @@
+{
+  "name": "leap-year-benchmark",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

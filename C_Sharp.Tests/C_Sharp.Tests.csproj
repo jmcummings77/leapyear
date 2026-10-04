@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Compile the production benchmark source to test its private variants directly. -->
+    <Compile Include="../C_Sharp/LeapYear.cs" Link="LeapYear.cs" />
+  </ItemGroup>
+</Project>

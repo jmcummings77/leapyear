@@ -1,17 +1,19 @@
+"""Leap-year benchmarks over start <= year < finish, in ascending order."""
+
 import time
-import math
 import statistics
 import argparse
-import os
 import json
+from functools import wraps
 
 times = {}
 
 def timing(f):
+    @wraps(f)
     def wrap(*args):
-        time1 = time.time()
+        time1 = time.perf_counter()
         ret = f(*args)
-        time2 = time.time()
+        time2 = time.perf_counter()
         if f.__name__ not in times:
             times[f.__name__] = []
         times[f.__name__].append((time2 - time1) * 1000.0)
@@ -21,12 +23,12 @@ def timing(f):
 
 @timing
 def code_golf(start, finish):
-    y=450
-    while y<600:y+=1;1>y%25<y%4or print(y*4)
+    y=(start+3)//4-1
+    while y<(finish-1)//4:y+=1;1>y%25<y%4 or print(y*4)
 
 @timing
 def leap_bit(start, finish):
-    [print(y) for y in range(start, finish + 1) if (not (y & 3)) and (y % 25 or (4 > y & 15))]
+    [print(y) for y in range(start, finish) if (not (y & 3)) and (y % 25 or (4 > y & 15))]
 
 @timing
 def no_optimizations(start, finish):
@@ -60,20 +62,21 @@ def reduced_modulos(start, finish):
 
 @timing
 def counter(start, finish):
-    while start % 4 != 0:
-        start += 1
-    hundred_counter = math.floor(((start % 100) / 4))
-    four_hundred_counter = math.floor(((start % 400) / 100))
+    four_counter = start % 4
+    hundred_counter = start % 100
+    four_hundred_counter = start % 400
     for year in range(start, finish):
-        if hundred_counter == 100:
-            four_hundred_counter += 1
-            hundred_counter = 1
-            if four_hundred_counter == 4:
-                print(year)
-                four_hundred_counter = 0
-        else:
-            hundred_counter += 1
+        if four_counter == 0 and (hundred_counter != 0 or four_hundred_counter == 0):
             print(year)
+        four_counter += 1
+        hundred_counter += 1
+        four_hundred_counter += 1
+        if four_counter == 4:
+            four_counter = 0
+        if hundred_counter == 100:
+            hundred_counter = 0
+        if four_hundred_counter == 400:
+            four_hundred_counter = 0
 
 
 @timing
@@ -99,20 +102,21 @@ def no_print_reduced_modulos(start, finish):
 @timing
 def no_print_counter(start, finish):
     result = []
-    while start % 4 != 0:
-        start += 1
-    hundred_counter = math.floor(((start % 100) / 4))
-    four_hundred_counter = math.floor(((start % 400) / 100))
+    four_counter = start % 4
+    hundred_counter = start % 100
+    four_hundred_counter = start % 400
     for year in range(start, finish):
-        if hundred_counter == 100:
-            four_hundred_counter += 1
-            hundred_counter = 1
-            if four_hundred_counter == 4:
-                result.append(year)
-                four_hundred_counter = 0
-        else:
-            hundred_counter += 1
+        if four_counter == 0 and (hundred_counter != 0 or four_hundred_counter == 0):
             result.append(year)
+        four_counter += 1
+        hundred_counter += 1
+        four_hundred_counter += 1
+        if four_counter == 4:
+            four_counter = 0
+        if hundred_counter == 100:
+            hundred_counter = 0
+        if four_hundred_counter == 400:
+            four_hundred_counter = 0
     return result
 
 
@@ -133,26 +137,21 @@ def no_print_count_by_four(start, finish):
 @timing
 def leap_bit_no_print(start, finish):
     result = []
-    finish += 4
     mod = start % 4
     if mod != 0:
         start += 4 - mod
-    for year in range(start, finish + 4, 4):
-        if year & 15 < 1:
-            if year % 25:
-                result.append(year)
-        else:
+    for year in range(start, finish, 4):
+        if year % 25 != 0 or year & 15 == 0:
             result.append(year)
     return result
 
 @timing
 def leap_year_modulos(start, finish):
-    finish += 4
     mod = start % 4
     if mod != 0:
         start += 4 - mod
     result = []
-    for year in range(start, finish + 4, 4):
+    for year in range(start, finish, 4):
         if year % 100 == 0:
             if year % 400 != 0:
                 continue
@@ -162,28 +161,25 @@ def leap_year_modulos(start, finish):
 @timing
 def leap_year_counter(start, finish):
     result = []
-    finish += 4
     mod = start % 4
     if mod != 0:
         start += 4 - mod
-    hundred_counter = math.floor(((start % 100) / 4))
-    four_hundred_counter = math.floor(((start % 400) / 100))
+    hundred_counter = (start % 100) // 4
+    four_hundred_counter = (start % 400) // 100
     for year in range(start, finish, 4):
-        if hundred_counter == 25:
-            four_hundred_counter += 1
-            hundred_counter = 1
-            if four_hundred_counter == 4:
-                result.append(year)
-                four_hundred_counter = 0
-        else:
-            hundred_counter += 1
+        if hundred_counter != 0 or four_hundred_counter == 0:
             result.append(year)
+        hundred_counter += 1
+        if hundred_counter == 25:
+            hundred_counter = 0
+            four_hundred_counter += 1
+            if four_hundred_counter == 4:
+                four_hundred_counter = 0
     return result
 
 
 @timing
 def leap_year_no_loops(start, finish):
-    finish += 4
     mod = start % 4
     if mod != 0:
         start += 4 - mod
@@ -193,30 +189,19 @@ def leap_year_no_loops(start, finish):
 
 @timing
 def leap_year_sets(start, finish):
-    result = []
-    finish += 4
-    mod = start % 4
-    if mod != 0:
-        start += 4 - mod
-    hundred_counter = math.floor(((start % 100) / 4))
-    four_hundred_counter = math.floor(((start % 400) / 100))
-    for year in range(start, finish, 4):
-        if hundred_counter == 25:
-            four_hundred_counter += 1
-            hundred_counter = 1
-            if four_hundred_counter == 4:
-                start = year
-                break
-        else:
-            hundred_counter += 1
-            result.append(year)
-    result.extend(list(set(range(start, finish, 4)).difference(
-            set(range(start, finish, 100)).difference(set(range(start, finish, 400))))))
-    return result
+    fours = set(range(start + (-start) % 4, finish, 4))
+    hundreds = set(range(start + (-start) % 100, finish, 100))
+    four_hundreds = set(range(start + (-start) % 400, finish, 400))
+    return sorted(fours.difference(hundreds.difference(four_hundreds)))
 
 
-def evaluate_performance(start, finish, filename, iterations, run_print):
-    for _ in range(iterations):
+def evaluate_performance(start, finish, filename, iterations, run_print, warmups=0):
+    if iterations <= 0:
+        raise ValueError("iterations must be positive")
+    if warmups < 0:
+        raise ValueError("warmups must be nonnegative")
+    times.clear()
+    for iteration in range(warmups + iterations):
         if run_print:
             no_optimizations(start, finish)
             pull_up_printing(start, finish)
@@ -232,6 +217,8 @@ def evaluate_performance(start, finish, filename, iterations, run_print):
         leap_year_counter(start, finish)
         leap_year_no_loops(start, finish)
         leap_year_sets(start, finish)
+        if iteration < warmups:
+            times.clear()
     results = {}
     for key, value in times.items():
         results[key] = statistics.mean(times[key])
@@ -241,10 +228,11 @@ def evaluate_performance(start, finish, filename, iterations, run_print):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', '--start', type=int, nargs='?', default=1582, help='Start year.')
-    parser.add_argument('-f', '--finish', type=int, nargs='?', default=2020, help='Final year.')
+    parser.add_argument('-s', '--start', type=int, nargs='?', default=1582, help='Start year (inclusive).')
+    parser.add_argument('-f', '--finish', type=int, nargs='?', default=2020, help='Stop year (exclusive).')
     parser.add_argument('-i', '--iterations', type=int, nargs='?', default=1, help='Number of iterations to run each function for profiling.')
+    parser.add_argument('--warmups', type=int, default=0, help='Untimed warmup iterations before collecting samples.')
     parser.add_argument('-o', '--output', type=str, nargs='?', default="../results/python_results.json", help='File path for output.')
     parser.add_argument('-r', action='store_true', help='Flag indicating whether to run tests for methods that print to the terminal.')
     args = parser.parse_args()
-    evaluate_performance(args.start, args.finish, args.output, args.iterations, args.r)
+    evaluate_performance(args.start, args.finish, args.output, args.iterations, args.r, args.warmups)

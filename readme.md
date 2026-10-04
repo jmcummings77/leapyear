@@ -2,59 +2,77 @@
 
 ![leapyyearwilliam](https://pixel.nymag.com/imgs/daily/vulture/2016/02/29/29-leap-day-30-rock-1.w710.h473.2x.jpg)
 
-This repository consists of alternative implementations of an algorithm to produce a list of leap years given a start and end year. The code is bad and I *do* feel bad. This is the only documentation you will get because I am a busy, busy man (read: lazy).
+Alternative leap-year algorithms in Python, Go, JavaScript, and C#, with correctness tests and a reproducible benchmark runner.
 
-Each language file (leap_year.py, LeapYear.cs, leapYear.go, leapYear.js) contains a core set of functions which represent some of the most common implementations and optimizations people suggest. I tried to implement each optimization category (1) on its own, then (2) paired with each of the other optimizations one at a time, then (3) all combined together to the greatest extent possible. That meant including unnecessary modulos in certain locations for consistency.
+## Range contract
 
-Broadly those optimizations are:
+Every implementation uses **start inclusive, finish exclusive**: `start <= year < finish`. Equal or reversed bounds produce no years. Methods return or print the same ascending sequence without duplicates, using the Gregorian rule: divisible by 4, except centuries not divisible by 400.
 
-1. Removing prints. This is the single most important optimization, and in fact omitting printing altogether is absolutely required for higher year-count runs--node even crashes at some point.
-2. Minimizing the number of modulos.
-3. Counting by four in the for loop (or equivalent range expression in Python)
-4. Eliminating modulos altogether from the for loops in favor of a counter and if statements (mods still required at the beginning to determine where the start year is in relation to the full 400 year cycle)
-5. Language specific "optimizations" which were of course not possible to reproduce and compare across languages, and most of which were either substantially slower (e.g. LINQ in C#) or only marginally competitive (range/filter in Python)
+For example, `[1582, 1582)` is empty, `[1596, 1605)` contains `1596, 1600, 1604`, and `[1696, 1705)` contains `1696, 1704`.
 
-Example results format (all times in ms averaged from 100 iterations of a 24m year run):
+The common strategies scan every year, replace repeated modulos with counters, step by four, or combine those optimizations. Additional implementations use bitwise operations, sets, filtering, or LINQ. Printing variants are checked for correctness but excluded from the comparison below.
 
-```json
-[{
-    "C#": {
-        "NoPrintReducedModulos": 115.77,
-        "NoPrintCounter": 239.98,
-        "NoPrintCountByFour": 54.16,
-        "LeapYearModulos": 74.86,
-        "LeapYearCounter": 58.32,
-        "LeapYearLinq": 258.19
-    },
-    "Go": {
-        "leapYear": 45.34,
-        "leapYearCounter": 39,
-        "leapYearModulos": 40.84,
-        "noPrintCountByFour": 38.4,
-        "noPrintCounter": 148.06,
-        "noPrintReducedModulos": 67.24
-    },
-    "JavaScript": {
-        "leapYearModulos": 110.26716390000657,
-        "leapYearCounter": 111.66275182003156,
-        "leapYearNoLoops": 1091.6129790399968,
-        "noPrintReducedModulos": 156.53878397995607,
-        "noPrintCounter": 607.1191596999764,
-        "noPrintCountByFour": 124.87465265996754
-    },
-    "Python": {
-        "no_print_reduced_modulos": 2095.338363647461,
-        "no_print_counter": 3259.244499206543,
-        "no_print_count_by_four": 1122.3544692993164,
-        "leap_year_modulos": 804.6444940567017,
-        "leap_year_counter": 811.4770174026489,
-        "leap_year_no_loops": 941.9522285461426,
-        "leap_year_sets": 1080.1961708068848
-    }}]
+## Run the checks
+
+Requirements: Python 3.9+, Go 1.20+, Node.js 20+, and the .NET 8 SDK. All tests and benchmark programs use their language's standard library; no Python, npm, Go, or NuGet packages need installing.
+
+From the repository root:
+
+```sh
+python3 -m unittest Python.test_leap_year -v
+(cd Go && go test ./...)
+node --test JavaScript/leapYear.test.js
+dotnet run --project C_Sharp.Tests/C_Sharp.Tests.csproj --configuration Release
 ```
 
-Thus far, Go wins out as the best overall performance. The worst Go implementation is better than the best C# implementation. In turn the worst C# implementation is better than the best JavaScript implementation and so on until Python shows up several minutes later wondering where everyone went.
+The suites check every starting phase of the 400-year Gregorian cycle, century boundaries, empty/reversed ranges, printing, timing precision, iteration counts, and warmup exclusion. They cover all 15 Python functions and all 11 methods in each of Go, JavaScript, and C#.
 
-The best algorithms vary by language, with the fully optimized counter implementation being the best in most languages, except Python, in which the raw, brute force modulo approach seems to be best.
+## Reproduce the comparison
 
-Of course, I probably did a terrible job in each language so take all of this with a grain of salt.
+```sh
+./runAll.sh
+# Choose a range and sample counts, or save a new published snapshot:
+./runAll.sh --start 1582 --finish 1000000 --iterations 10 --warmups 3 --output benchmarks/latest.json
+```
+
+The runner executes every correctness suite first and stops on failure. It builds Go and C# (Release), then runs the languages sequentially with the same range and sample counts. Each method gets three in-process warmups followed by ten measured calls by default. Printing is disabled. Reported values are arithmetic means in milliseconds, including result construction and any garbage collection during the call; compilation and process startup are excluded. Python, Go, and JavaScript use monotonic timers; C# records `Elapsed.TotalMilliseconds` as a `double`.
+
+The default output is `results/latest.json`. The report includes all method means, bounds, sample counts, runtime versions, hardware, timestamps, and SHA-256 hashes of the measured sources. The runner also prints the common-strategy table. Positive iteration counts and nonnegative warmup counts are required.
+
+Individual programs remain usable:
+
+```sh
+python3 Python/leap_year.py --start 1582 --finish 2020 --iterations 10 --warmups 3 --output results/python.json
+go run Go/leapYear.go 1582 2020 10 results/go.json false 3
+node JavaScript/leapYear.js --start 1582 --finish 2020 --iterations 10 --warmups 3 --fileName results/javascript.json
+dotnet run --project C_Sharp/C_Sharp.csproj --configuration Release -- 1582 2020 10 results/csharp.json false 3
+```
+
+Create `results/` first when invoking individual programs. The Go and C# final positional arguments are the print flag and optional warmup count; Python uses `-r` for printing and JavaScript uses `--print`.
+
+## Measured comparison
+
+Measured on **2026-10-04 UTC**, on an **Apple M1, macOS 26.5.1 (arm64)**, with Python **3.9.6**, Go **1.24.1**, Node.js **25.9.0**, and .NET **8.0.2** (SDK **8.0.201**, Release).
+
+All methods use `[1582, 1000000)`, containing **242,116 leap years**, with **3 warmups and 10 measured calls per method**. Values below are mean milliseconds per call; lower is faster.
+
+| Strategy | Python | Go | JavaScript | C# |
+| --- | ---: | ---: | ---: | ---: |
+| Scan each year | 60.857 | 3.253 | 2.125 | 1.551 |
+| Counter each year | 125.127 | 3.082 | 4.067 | 1.905 |
+| Step by four | 21.216 | 2.909 | 2.091 | 1.532 |
+| Optimized modulo | 37.653 | 2.069 | 2.109 | 1.219 |
+| Optimized counter | 24.707 | 2.193 | 1.608 | 0.863 |
+
+Additional variants measured in the same run:
+
+| Language | Method | Mean ms |
+| --- | --- | ---: |
+| Python | `leap_bit_no_print` (Bitwise, stepping by four) | 16.232 |
+| Python | `leap_year_no_loops` (Range/filter) | 17.678 |
+| Python | `leap_year_sets` (Set difference and sort) | 23.896 |
+| Go | `leapYear` (Modulo, testing 400 first) | 3.050 |
+| JavaScript | `leapYearNoLoops` (Array construction/filter) | 14.111 |
+| C# | `LeapYearLinq` (LINQ) | 7.854 |
+
+These measurements describe this workload on this machine and runtime configuration. Small differences can vary with scheduling, allocation, garbage collection, and JIT behavior; this run does not establish a general language ranking. The complete measurements and source hashes are in [benchmarks/latest.json](benchmarks/latest.json).
